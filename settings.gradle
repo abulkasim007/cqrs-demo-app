@@ -1,0 +1,11 @@
+rootProject.name = 'cqrs-demo-app'
+
+include 'accounts-application'
+include 'accounts-commands'
+include 'accounts-events'
+include 'erp-orchestrator'
+include 'microfinance-commands'
+include 'microfinance-events'
+include 'microfinance-application'
+include 'commons'
+
