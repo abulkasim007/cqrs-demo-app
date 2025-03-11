@@ -4,7 +4,6 @@ import java.io.IOException;
 import org.apache.pulsar.client.api.SubscriptionType;
 import org.apache.pulsar.common.schema.SchemaType;
 import org.brac.accounts.commands.CreateVoucherCommand;
-import org.brac.accounts.events.VoucherCreatedEvent;
 import org.brac.accounts.services.VoucherService;
 import org.brac.commons.utils.JsonHelpers;
 import org.springframework.pulsar.annotation.PulsarListener;

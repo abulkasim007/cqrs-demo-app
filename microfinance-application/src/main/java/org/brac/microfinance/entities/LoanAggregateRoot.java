@@ -14,7 +14,6 @@ import org.brac.microfinance.events.DisbursementEvent;
 import org.brac.microfinance.events.DisbursementStatus;
 import org.brac.microfinance.events.LoanAcceptedEvent;
 import org.brac.microfinance.events.LoanDisbursementRequestedEvent;
-import org.springframework.transaction.annotation.Transactional;
 
 @Entity
 @Table(name = "loan_aggregate_roots")
