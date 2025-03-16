@@ -21,7 +21,6 @@ public class CreateVoucherCommandListener {
   @PulsarListener(subscriptionName = "Accounts.Write", topics = "Accounts.Commands.CreateVoucherCommand",
       schemaType = SchemaType.BYTES, autoStartup = "true", ackMode = AckMode.RECORD, subscriptionType = SubscriptionType.Shared)
   public void listen(byte[] message) throws IOException {
-    System.out.println(Thread.currentThread().isVirtual());
     CreateVoucherCommand command = JsonHelpers.getMessage(message, CreateVoucherCommand.class);
     voucherService.createVoucher(command);
   }

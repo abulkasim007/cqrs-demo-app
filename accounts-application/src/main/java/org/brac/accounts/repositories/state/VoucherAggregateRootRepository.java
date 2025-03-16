@@ -1,4 +1,4 @@
-package org.brac.accounts.repositories;
+package org.brac.accounts.repositories.state;
 
 import java.util.UUID;
 import org.brac.accounts.entities.VoucherAggregateRoot;

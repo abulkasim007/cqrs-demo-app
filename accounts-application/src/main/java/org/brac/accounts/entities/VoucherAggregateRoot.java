@@ -79,6 +79,14 @@ public class VoucherAggregateRoot extends AggregateRoot {
     voucherCreatedEvent.setDisbursementId(disbursementId);
     voucherCreatedEvent.setJournalEvents(from(journalEntities, voucherCreatedEvent, tenantId, verticalId));
 
+    voucherCreatedEvent.setId(UUID.randomUUID());
+    voucherCreatedEvent.setAggregateRootId(this.getId());
+    voucherCreatedEvent.setAggregateRootVersion(this.getVersion());
+    voucherCreatedEvent.setTimeStamp(new Date());
+    voucherCreatedEvent.setSource(VoucherCreatedEvent.class.getName());
+    voucherCreatedEvent.setCorrelationId(UUID.randomUUID());
+
+
     this.addEvent(voucherCreatedEvent);
   }
 

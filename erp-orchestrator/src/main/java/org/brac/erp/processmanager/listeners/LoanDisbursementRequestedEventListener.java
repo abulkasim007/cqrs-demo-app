@@ -23,7 +23,6 @@ public class LoanDisbursementRequestedEventListener {
   @PulsarListener(subscriptionName = "Erp.Orchestrator", topics = "Microfinance.Events.LoanDisbursementRequestedEvent",
       schemaType = SchemaType.BYTES, autoStartup = "true", ackMode = AckMode.RECORD, subscriptionType = SubscriptionType.Shared)
   public void listen(byte[] message) throws IOException {
-    System.out.println(Thread.currentThread().isVirtual());
     LoanDisbursementRequestedEvent event = JsonHelpers.getMessage(message, LoanDisbursementRequestedEvent.class);
     this.erpOrchestrator.handleLoanDisbursementRequestedEvent(event);
   }

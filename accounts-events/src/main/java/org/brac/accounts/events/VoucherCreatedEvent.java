@@ -10,7 +10,7 @@ import java.util.UUID;
 import org.brac.commons.primatives.Event;
 
 @Entity
-@Table(name = "voucher_created_events")
+@Table(name = "voucher_created_event")
 public class VoucherCreatedEvent extends Event {
 
   private double amount;

@@ -21,7 +21,6 @@ public class VoucherCreatedEventListener {
   @PulsarListener(subscriptionName = "Erp.Orchestrator", topics = "Accounts.Events.VoucherCreatedEvent",
       schemaType = SchemaType.BYTES, autoStartup = "true", ackMode = AckMode.RECORD, subscriptionType = SubscriptionType.Shared)
   public void listen(byte[] message) throws IOException {
-    System.out.println(Thread.currentThread().isVirtual());
     VoucherCreatedEvent event = JsonHelpers.getMessage(message, VoucherCreatedEvent.class);
     this.erpOrchestrator.handleVoucherCreatedEvent(event);
   }

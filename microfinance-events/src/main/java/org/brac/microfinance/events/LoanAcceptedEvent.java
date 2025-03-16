@@ -11,7 +11,6 @@ public class LoanAcceptedEvent extends Event  {
   private UUID loanId;
   private UUID voucherId;
   private UUID disbursementId;
-  private String topic;
 
   public UUID getLoanId() {
     return loanId;
@@ -35,14 +34,6 @@ public class LoanAcceptedEvent extends Event  {
 
   public void setDisbursementId(UUID disbursementId) {
     this.disbursementId = disbursementId;
-  }
-
-  public String getTopic() {
-    return topic;
-  }
-
-  public void setTopic(String topic) {
-    this.topic = topic;
   }
 }
 

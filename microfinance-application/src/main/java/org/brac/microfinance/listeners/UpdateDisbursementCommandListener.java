@@ -23,7 +23,6 @@ public class UpdateDisbursementCommandListener {
   @PulsarListener(subscriptionName = "Microfinance.Write", topics = "Microfinance.Commands.UpdateDisbursementCommand",
       schemaType = SchemaType.BYTES, autoStartup = "true", ackMode = AckMode.RECORD, subscriptionType = SubscriptionType.Shared)
   public void listen(byte[] message) throws IOException {
-    System.out.println(Thread.currentThread().isVirtual());
     UpdateDisbursementCommand command = JsonHelpers.getMessage(message, UpdateDisbursementCommand.class);
     loanService.updateDisbursement(command);
   }

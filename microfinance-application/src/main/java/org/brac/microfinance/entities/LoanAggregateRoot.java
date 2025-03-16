@@ -122,7 +122,15 @@ public class LoanAggregateRoot extends AggregateRoot {
       loanAcceptedEvent.setLoanId(this.getId());
       loanAcceptedEvent.setDisbursementId(disbursementEntity.getId());
       loanAcceptedEvent.setVoucherId(disbursementEntity.getVoucherId());
-      loanAcceptedEvent.setTopic(loanAcceptedEvent.getClass().getName());
+
+      loanAcceptedEvent.setId(UUID.randomUUID());
+      loanAcceptedEvent.setAggregateRootId(this.getId());
+      loanAcceptedEvent.setAggregateRootVersion(this.getVersion());
+      loanAcceptedEvent.setTimeStamp(new Date());
+      loanAcceptedEvent.setSource(LoanAcceptedEvent.class.getName());
+      loanAcceptedEvent.setCorrelationId(UUID.randomUUID());
+
+
       this.addEvent(loanAcceptedEvent);
     }
   }
