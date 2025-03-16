@@ -8,7 +8,6 @@ import org.brac.microfinance.commands.UpdateDisbursementCommand;
 import org.brac.microfinance.services.LoanService;
 import org.springframework.pulsar.annotation.PulsarListener;
 import org.springframework.pulsar.listener.AckMode;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,7 +19,7 @@ public class UpdateDisbursementCommandListener {
     this.loanService = loanService;
   }
 
-  @Async
+
   @PulsarListener(subscriptionName = "Microfinance.Write", topics = "Microfinance.Commands.UpdateDisbursementCommand",
       schemaType = SchemaType.BYTES, autoStartup = "true", ackMode = AckMode.RECORD, subscriptionType = SubscriptionType.Shared)
   public void listen(byte[] message) throws IOException {

@@ -8,7 +8,6 @@ import org.brac.commons.utils.JsonHelpers;
 import org.brac.erp.processmanager.services.ErpOrchestrator;
 import org.springframework.pulsar.annotation.PulsarListener;
 import org.springframework.pulsar.listener.AckMode;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,7 +18,6 @@ public class VoucherCreatedEventListener {
     this.erpOrchestrator = erpOrchestrator;
   }
 
-  @Async
   @PulsarListener(subscriptionName = "Erp.Orchestrator", topics = "Accounts.Events.VoucherCreatedEvent",
       schemaType = SchemaType.BYTES, autoStartup = "true", ackMode = AckMode.RECORD, subscriptionType = SubscriptionType.Shared)
   public void listen(byte[] message) throws IOException {

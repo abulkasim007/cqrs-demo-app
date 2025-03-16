@@ -1,4 +1,4 @@
-package org.brac.microfinance.repositories;
+package org.brac.microfinance.repositories.state;
 
 import java.util.UUID;
 import org.brac.microfinance.entities.LoanAggregateRoot;

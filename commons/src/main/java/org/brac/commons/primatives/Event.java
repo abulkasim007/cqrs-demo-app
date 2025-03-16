@@ -3,9 +3,7 @@ package org.brac.commons.primatives;
 
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.Transient;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @MappedSuperclass
@@ -16,8 +14,8 @@ public abstract class Event {
   private int aggregateRootVersion;
   private Date timeStamp;
   private String source;
-  private String type;
 
+  private UUID correlationId;
 
   public UUID getAggregateRootId() {
     return aggregateRootId;
@@ -51,14 +49,6 @@ public abstract class Event {
     this.source = source;
   }
 
-  public String getType() {
-    return type;
-  }
-
-  public void setType(String type) {
-    this.type = type;
-  }
-
 
 
   public UUID getId() {
@@ -67,5 +57,13 @@ public abstract class Event {
 
   public void setId(UUID id) {
     this.id = id;
+  }
+
+  public UUID getCorrelationId() {
+    return correlationId;
+  }
+
+  public void setCorrelationId(UUID correlationId) {
+    this.correlationId = correlationId;
   }
 }

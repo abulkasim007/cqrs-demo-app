@@ -2,7 +2,13 @@ spring:
   pulsar:
     client:
       service-url: pulsar://10.42.53.213:6650
-  datasource:
-    url: jdbc:postgresql://localhost/microfinance_state_database
-    password: 12345
-    username: postgres
+  state:
+    datasource:
+      jdbcUrl: jdbc:postgresql://localhost/microfinance_state_database
+      password: 12345
+      username: postgres
+  event:
+    datasource:
+      jdbcUrl: jdbc:postgresql://localhost/microfinance_event_database
+      password: 12345
+      username: postgres

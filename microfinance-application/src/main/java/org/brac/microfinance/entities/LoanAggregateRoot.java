@@ -18,6 +18,9 @@ import org.brac.microfinance.events.LoanDisbursementRequestedEvent;
 @Entity
 @Table(name = "loan_aggregate_roots")
 public class LoanAggregateRoot extends AggregateRoot {
+
+  private static final UUID EMPTY_VOUCHER_ID = new UUID(0L, 0L);
+
   private UUID memberId;
   private double amount;
 
@@ -58,6 +61,7 @@ public class LoanAggregateRoot extends AggregateRoot {
       disbursementEntity.setVoucherId(UUID.randomUUID());
       disbursementEntity.assignEntityDefaults(memberId, tenantId, verticalId);
       disbursementEntity.setLoanAggregateRoot(this);
+      disbursementEntity.setVoucherId(EMPTY_VOUCHER_ID);
       disbursementEntity.setDisbursementStatus(DisbursementStatus.PENDING);
       this.disbursementEntities.add(disbursementEntity);
     }
@@ -72,6 +76,13 @@ public class LoanAggregateRoot extends AggregateRoot {
         this.disbursementEntities.stream().findAny().orElseThrow().getId());
     loanDisbursementRequestedEvent.disbursementEvents =
         from(this.disbursementEntities, loanDisbursementRequestedEvent, memberId, tenantId, verticalId);
+
+    loanDisbursementRequestedEvent.setId(UUID.randomUUID());
+    loanDisbursementRequestedEvent.setAggregateRootId(this.getId());
+    loanDisbursementRequestedEvent.setAggregateRootVersion(this.getVersion());
+    loanDisbursementRequestedEvent.setTimeStamp(new Date());
+    loanDisbursementRequestedEvent.setSource(LoanAggregateRoot.class.getName());
+    loanDisbursementRequestedEvent.setCorrelationId(UUID.randomUUID());
 
     this.addEvent(loanDisbursementRequestedEvent);
   }
@@ -91,12 +102,12 @@ public class LoanAggregateRoot extends AggregateRoot {
       disbursementEvent.assignEntityDefaults(memberId, tenantId, verticalId);
       disbursementEvent.setLoanDisbursementRequestedEvent(loanDisbursementRequestedEvent);
       disbursementEvent.setDisbursementStatus(disbursementEntity.getDisbursementStatus());
+      disbursementEvent.setVoucherId(EMPTY_VOUCHER_ID);
 
       disbursementEvents.add(disbursementEvent);
     }
     return disbursementEvents;
   }
-
 
 
   public void updateDisbursement(UUID disbursementId, UUID voucherId, DisbursementStatus disbursementStatus) {
