@@ -3,13 +3,15 @@ spring:
     client:
       service-url: pulsar://10.42.53.213:6650
   state:
-    datasource:
-      jdbcUrl: jdbc:postgresql://localhost/accounts_state_database
+    r2dbc:
+      url: r2dbc:postgresql://localhost/accounts_state_database
       password: 12345
       username: postgres
   event:
-    datasource:
-      jdbcUrl: jdbc:postgresql://localhost/accounts_event_database
+    r2dbc:
+      url: r2dbc:postgresql://localhost/accounts_event_database
       password: 12345
       username: postgres
 
+  jpa:
+    show-sql: true

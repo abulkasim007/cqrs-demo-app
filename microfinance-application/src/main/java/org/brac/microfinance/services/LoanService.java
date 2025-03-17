@@ -32,12 +32,11 @@ public class LoanService {
 
   public void disburse(DisburseCommand command) {
     LoanAggregateRoot loanAggregateRoot = new LoanAggregateRoot();
-    loanAggregateRoot.disburse(command.getLoanId(), command.getAmount(), command.getMemberId(), command.getTenantId(),
-        command.getVerticalId());
-    this.loanAggregateRootRepository.save(loanAggregateRoot);
-
     LoanDisbursementRequestedEvent loanDisbursementRequestedEvent =
-        (LoanDisbursementRequestedEvent) loanAggregateRoot.getEvents().getFirst();
+        loanAggregateRoot.disburse(command.getLoanId(), command.getAmount(), command.getMemberId(),
+            command.getTenantId(),
+            command.getVerticalId());
+    this.loanAggregateRootRepository.save(loanAggregateRoot);
 
     this.loanDisbursementRequestedEventRepository.save(loanDisbursementRequestedEvent);
 
@@ -49,13 +48,10 @@ public class LoanService {
   public void updateDisbursement(UpdateDisbursementCommand command) {
     LoanAggregateRoot loanAggregateRoot = this.loanAggregateRootRepository.findById(command.getLoanId()).orElseThrow();
 
-    loanAggregateRoot.updateDisbursement(command.getDisbursementId(), command.getVoucherId(),
+    LoanAcceptedEvent loanAcceptedEvent =  loanAggregateRoot.updateDisbursement(command.getDisbursementId(), command.getVoucherId(),
         DisbursementStatus.ACCEPTED);
 
     this.loanAggregateRootRepository.save(loanAggregateRoot);
-
-    LoanAcceptedEvent loanAcceptedEvent =
-        (LoanAcceptedEvent) loanAggregateRoot.getEvents().getFirst();
 
     this.loanAcceptedEventRepository.save(loanAcceptedEvent);
   }

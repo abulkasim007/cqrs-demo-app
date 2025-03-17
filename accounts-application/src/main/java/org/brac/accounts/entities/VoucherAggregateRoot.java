@@ -1,17 +1,14 @@
 package org.brac.accounts.entities;
 
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 import org.brac.accounts.events.JournalEvent;
 import org.brac.accounts.events.VoucherCreatedEvent;
 import org.brac.commons.primatives.AggregateRoot;
+import org.springframework.data.relational.core.mapping.Table;
 
 @Entity
 @Table(name = "voucher_aggregate_roots")
@@ -23,14 +20,10 @@ public class VoucherAggregateRoot extends AggregateRoot {
   private double amount;
   private UUID loanId;
 
-  @OneToMany(
-      mappedBy = "voucherAggregateRoot",
-      cascade = CascadeType.ALL,
-      orphanRemoval = true
-  )
-  private Set<JournalEntity> journalEntities;
 
-  public void create(UUID loanId, double amount, UUID memberId, UUID disbursementId, UUID tenantId, UUID verticalId) {
+  public VoucherCreatedEvent create(UUID loanId, double amount, UUID memberId, UUID disbursementId, UUID tenantId,
+                                    UUID verticalId,
+                                    List<JournalEntity> journalEntities, List<JournalEvent> journalEvents) {
 
     UUID voucherId = UUID.randomUUID();
 
@@ -50,7 +43,6 @@ public class VoucherAggregateRoot extends AggregateRoot {
     debitJournal.setDebit(amount);
     debitJournal.setHead(memberId);
     debitJournal.setDate(journalDate);
-    debitJournal.setVoucherAggregateRoot(this);
     debitJournal.assignEntityDefaults(memberId, tenantId, verticalId);
 
     JournalEntity creditJournal = new JournalEntity();
@@ -60,24 +52,24 @@ public class VoucherAggregateRoot extends AggregateRoot {
     creditJournal.setCredit(amount);
     creditJournal.setHead(LOAN_ACCOUNT_HEAD);
     creditJournal.setDate(journalDate);
-    creditJournal.setVoucherAggregateRoot(this);
     creditJournal.assignEntityDefaults(memberId, tenantId, verticalId);
 
-    this.journalEntities = new HashSet<>();
 
-    this.journalEntities.add(debitJournal);
-    this.journalEntities.add(creditJournal);
+    journalEntities.add(debitJournal);
+    journalEntities.add(creditJournal);
 
 
     VoucherCreatedEvent voucherCreatedEvent = new VoucherCreatedEvent();
 
+
+    from(journalEntities, journalEvents, tenantId, verticalId);
 
     voucherCreatedEvent.setAmount(amount);
     voucherCreatedEvent.setLoanId(loanId);
     voucherCreatedEvent.setMemberId(memberId);
     voucherCreatedEvent.setVoucherId(voucherId);
     voucherCreatedEvent.setDisbursementId(disbursementId);
-    voucherCreatedEvent.setJournalEvents(from(journalEntities, voucherCreatedEvent, tenantId, verticalId));
+
 
     voucherCreatedEvent.setId(UUID.randomUUID());
     voucherCreatedEvent.setAggregateRootId(this.getId());
@@ -87,13 +79,12 @@ public class VoucherAggregateRoot extends AggregateRoot {
     voucherCreatedEvent.setCorrelationId(UUID.randomUUID());
 
 
-    this.addEvent(voucherCreatedEvent);
+    return voucherCreatedEvent;
   }
 
-  private Set<JournalEvent> from(Set<JournalEntity> journalEntities,
-                                 VoucherCreatedEvent voucherCreatedEvent, UUID tenantId, UUID verticalId) {
+  private List<JournalEvent> from(List<JournalEntity> journalEntities, List<JournalEvent> journalEvents, UUID tenantId,
+                                  UUID verticalId) {
 
-    Set<JournalEvent> journalEvents = new HashSet<>();
 
     for (JournalEntity journalEntity : journalEntities) {
       JournalEvent journalEvent = new JournalEvent();
@@ -103,7 +94,6 @@ public class VoucherAggregateRoot extends AggregateRoot {
       journalEvent.setCredit(journalEntity.getCredit());
       journalEvent.setDebit(journalEntity.getDebit());
       journalEvent.setHead(journalEntity.getHead());
-      journalEvent.setVoucherCreatedEvent(voucherCreatedEvent);
       journalEvent.assignEntityDefaults(memberId, tenantId, verticalId);
       journalEvents.add(journalEvent);
     }
@@ -135,13 +125,5 @@ public class VoucherAggregateRoot extends AggregateRoot {
 
   public void setLoanId(UUID loanId) {
     this.loanId = loanId;
-  }
-
-  public Set<JournalEntity> getJournals() {
-    return journalEntities;
-  }
-
-  public void setJournals(Set<JournalEntity> journals) {
-    this.journalEntities = journals;
   }
 }

@@ -1,39 +1,41 @@
 package org.brac.erp.processmanager.services;
 
 import java.util.UUID;
+import org.apache.pulsar.client.api.MessageId;
 import org.brac.accounts.commands.CreateVoucherCommand;
 import org.brac.accounts.events.VoucherCreatedEvent;
 import org.brac.microfinance.commands.UpdateDisbursementCommand;
 import org.brac.microfinance.events.LoanDisbursementRequestedEvent;
-import org.springframework.pulsar.core.PulsarTemplate;
+import org.springframework.pulsar.reactive.core.ReactivePulsarTemplate;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 @Service
 public class ErpOrchestrator {
 
-  private final PulsarTemplate<CreateVoucherCommand> createVoucherCommandPulsarTemplate;
-  private final PulsarTemplate<UpdateDisbursementCommand> updateDisbursementCommandPulsarTemplate;
+  private final ReactivePulsarTemplate<CreateVoucherCommand> createVoucherCommandPulsarTemplate;
+  private final ReactivePulsarTemplate<UpdateDisbursementCommand> updateDisbursementCommandPulsarTemplate;
 
 
-  public ErpOrchestrator(PulsarTemplate<CreateVoucherCommand> createVoucherCommandPulsarTemplate,
-                         PulsarTemplate<UpdateDisbursementCommand> updateDisbursementCommandPulsarTemplate) {
+  public ErpOrchestrator(ReactivePulsarTemplate<CreateVoucherCommand> createVoucherCommandPulsarTemplate,
+                         ReactivePulsarTemplate<UpdateDisbursementCommand> updateDisbursementCommandPulsarTemplate) {
 
     this.createVoucherCommandPulsarTemplate = createVoucherCommandPulsarTemplate;
     this.updateDisbursementCommandPulsarTemplate = updateDisbursementCommandPulsarTemplate;
   }
 
-  public void handleVoucherCreatedEvent(VoucherCreatedEvent event) {
+  public Mono<MessageId> handleVoucherCreatedEvent(VoucherCreatedEvent event) {
     UpdateDisbursementCommand updateDisbursementCommand = new UpdateDisbursementCommand();
 
     updateDisbursementCommand.setLoanId(event.getLoanId());
     updateDisbursementCommand.setVoucherId(event.getVoucherId());
     updateDisbursementCommand.setDisbursementId(event.getDisbursementId());
 
-    this.updateDisbursementCommandPulsarTemplate.send("Microfinance.Commands.UpdateDisbursementCommand",
+   return this.updateDisbursementCommandPulsarTemplate.send("Microfinance.Commands.UpdateDisbursementCommand",
         updateDisbursementCommand);
   }
 
-  public void handleLoanDisbursementRequestedEvent(LoanDisbursementRequestedEvent event) {
+  public Mono<MessageId> handleLoanDisbursementRequestedEvent(LoanDisbursementRequestedEvent event) {
 
     CreateVoucherCommand createVoucherCommand = new CreateVoucherCommand();
 
@@ -44,6 +46,6 @@ public class ErpOrchestrator {
     createVoucherCommand.setTenantId(UUID.randomUUID());
     createVoucherCommand.setVerticalId(UUID.randomUUID());
 
-    this.createVoucherCommandPulsarTemplate.send("Accounts.Commands.CreateVoucherCommand", createVoucherCommand);
+    return this.createVoucherCommandPulsarTemplate.send("Accounts.Commands.CreateVoucherCommand", createVoucherCommand);
   }
 }

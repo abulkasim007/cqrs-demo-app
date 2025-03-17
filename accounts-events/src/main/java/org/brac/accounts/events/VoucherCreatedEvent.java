@@ -1,11 +1,8 @@
 package org.brac.accounts.events;
 
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.Set;
 import java.util.UUID;
 import org.brac.commons.primatives.Event;
 
@@ -18,15 +15,6 @@ public class VoucherCreatedEvent extends Event {
   private UUID voucherId;
   private UUID memberId;
   private UUID disbursementId;
-
-  @OneToMany(
-      mappedBy = "voucherCreatedEvent",
-      cascade = CascadeType.ALL,
-      orphanRemoval = true
-  )
-  private Set<JournalEvent> journalEvents;
-
-
 
   public void setAmount(double amount) {
     this.amount = amount;
@@ -62,13 +50,5 @@ public class VoucherCreatedEvent extends Event {
 
   public void setDisbursementId(UUID disbursementId) {
     this.disbursementId = disbursementId;
-  }
-
-  public Set<JournalEvent> getJournalEvents() {
-    return journalEvents;
-  }
-
-  public void setJournalEvents(Set<JournalEvent> journalEvents) {
-    this.journalEvents = journalEvents;
   }
 }

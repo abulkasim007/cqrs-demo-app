@@ -40,7 +40,7 @@ public class LoanAggregateRoot extends AggregateRoot {
   )
   private Set<DisbursementEntity> disbursementEntities;
 
-  public void disburse(UUID loanId, double amount, UUID memberId, UUID tenantId, UUID verticalId) {
+  public LoanDisbursementRequestedEvent disburse(UUID loanId, double amount, UUID memberId, UUID tenantId, UUID verticalId) {
 
     this.setId(loanId);
     this.setAmount(amount);
@@ -84,7 +84,7 @@ public class LoanAggregateRoot extends AggregateRoot {
     loanDisbursementRequestedEvent.setSource(LoanAggregateRoot.class.getName());
     loanDisbursementRequestedEvent.setCorrelationId(UUID.randomUUID());
 
-    this.addEvent(loanDisbursementRequestedEvent);
+    return loanDisbursementRequestedEvent;
   }
 
   private static Set<DisbursementEvent> from(Set<DisbursementEntity> disbursements,
@@ -110,14 +110,14 @@ public class LoanAggregateRoot extends AggregateRoot {
   }
 
 
-  public void updateDisbursement(UUID disbursementId, UUID voucherId, DisbursementStatus disbursementStatus) {
+  public LoanAcceptedEvent updateDisbursement(UUID disbursementId, UUID voucherId, DisbursementStatus disbursementStatus) {
 
     DisbursementEntity disbursementEntity =
         this.getDisbursementEntities().stream().filter(d -> d.getId().equals(disbursementId)).findFirst().orElseThrow();
 
     disbursementEntity.updateDisbursementStatus(voucherId, disbursementStatus);
 
-    if (disbursementStatus == DisbursementStatus.ACCEPTED) {
+
       LoanAcceptedEvent loanAcceptedEvent = new LoanAcceptedEvent();
       loanAcceptedEvent.setLoanId(this.getId());
       loanAcceptedEvent.setDisbursementId(disbursementEntity.getId());
@@ -131,8 +131,7 @@ public class LoanAggregateRoot extends AggregateRoot {
       loanAcceptedEvent.setCorrelationId(UUID.randomUUID());
 
 
-      this.addEvent(loanAcceptedEvent);
-    }
+     return loanAcceptedEvent;
   }
 
   public UUID getMemberId() {

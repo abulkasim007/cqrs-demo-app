@@ -23,7 +23,9 @@ dependencies {
     implementation project(':accounts-events')
     implementation project(':accounts-commands')
 
-    implementation 'org.postgresql:postgresql'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-pulsar'
+    implementation 'org.postgresql:r2dbc-postgresql:1.0.0.RELEASE'
+
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+    implementation 'org.springframework.boot:spring-boot-starter-pulsar-reactive:3.4.3'
 }
