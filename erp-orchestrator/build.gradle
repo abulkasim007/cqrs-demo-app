@@ -26,6 +26,6 @@ dependencies {
     implementation project(':microfinance-events')
     implementation project(':microfinance-commands')
 
-    implementation 'org.springframework.boot:spring-boot-starter-pulsar-reactive:3.4.3'
+    implementation 'org.springframework.boot:spring-boot-starter-pulsar-reactive'
 
 }

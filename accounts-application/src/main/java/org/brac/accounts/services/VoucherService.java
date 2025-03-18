@@ -2,6 +2,7 @@ package org.brac.accounts.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.pulsar.client.api.MessageId;
 import org.brac.accounts.commands.CreateVoucherCommand;
 import org.brac.accounts.entities.JournalEntity;
 import org.brac.accounts.entities.VoucherAggregateRoot;
@@ -13,6 +14,7 @@ import org.brac.accounts.repositories.state.JournalEntityRepository;
 import org.brac.accounts.repositories.state.VoucherAggregateRootRepository;
 import org.springframework.pulsar.reactive.core.ReactivePulsarTemplate;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 @Service
 public class VoucherService {
@@ -34,7 +36,7 @@ public class VoucherService {
     this.voucherCreatedEventPulsarTemplate = voucherCreatedEventPulsarTemplate;
   }
 
-  public void createVoucher(CreateVoucherCommand command) {
+  public Mono<MessageId> createVoucher(CreateVoucherCommand command) {
     List<JournalEvent> journalEvents = new ArrayList<>();
     List<JournalEntity> journalEntities = new ArrayList<>();
 
@@ -44,7 +46,7 @@ public class VoucherService {
         command.getLoanId(), command.getAmount(), command.getMemberId(),
         command.getDisbursementId(), command.getTenantId(), command.getVerticalId(), journalEntities, journalEvents);
 
-    this.voucherAggregateRootRepository.save(voucherAggregateRoot)
+   return this.voucherAggregateRootRepository.save(voucherAggregateRoot)
         .flatMap(savedVoucher -> this.journalEntityRepository.saveAll(journalEntities).collectList()
             .thenReturn(savedVoucher))
         .flatMap(event -> this.voucherCreatedEventRepository.save(voucherCreatedEvent)
@@ -53,6 +55,6 @@ public class VoucherService {
             .thenReturn(voucherCreatedEvent))
         .flatMap(vce -> this.voucherCreatedEventPulsarTemplate
             .send("Accounts.Events.VoucherCreatedEvent", voucherCreatedEvent)
-        ).subscribe();
+        );
   }
 }

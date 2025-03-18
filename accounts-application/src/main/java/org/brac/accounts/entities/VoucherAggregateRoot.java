@@ -82,8 +82,8 @@ public class VoucherAggregateRoot extends AggregateRoot {
     return voucherCreatedEvent;
   }
 
-  private List<JournalEvent> from(List<JournalEntity> journalEntities, List<JournalEvent> journalEvents, UUID tenantId,
-                                  UUID verticalId) {
+  private void from(List<JournalEntity> journalEntities, List<JournalEvent> journalEvents, UUID tenantId,
+                    UUID verticalId) {
 
 
     for (JournalEntity journalEntity : journalEntities) {
@@ -98,7 +98,6 @@ public class VoucherAggregateRoot extends AggregateRoot {
       journalEvents.add(journalEvent);
     }
 
-    return journalEvents;
   }
 
 
