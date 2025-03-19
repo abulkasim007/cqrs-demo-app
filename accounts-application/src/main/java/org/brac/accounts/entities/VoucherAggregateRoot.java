@@ -2,7 +2,7 @@ package org.brac.accounts.entities;
 
 
 import jakarta.persistence.Entity;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import org.brac.accounts.events.JournalEvent;
@@ -34,7 +34,7 @@ public class VoucherAggregateRoot extends AggregateRoot {
     this.setMemberId(memberId);
     this.assignEntityDefaults(memberId, tenantId, verticalId);
 
-    Date journalDate = new Date();
+    OffsetDateTime journalDate = OffsetDateTime.now();
 
     JournalEntity debitJournal = new JournalEntity();
 
@@ -74,7 +74,7 @@ public class VoucherAggregateRoot extends AggregateRoot {
     voucherCreatedEvent.setId(UUID.randomUUID());
     voucherCreatedEvent.setAggregateRootId(this.getId());
     voucherCreatedEvent.setAggregateRootVersion(this.getVersion());
-    voucherCreatedEvent.setTimeStamp(new Date());
+    voucherCreatedEvent.setTimeStamp( OffsetDateTime.now());
     voucherCreatedEvent.setSource(VoucherCreatedEvent.class.getName());
     voucherCreatedEvent.setCorrelationId(UUID.randomUUID());
 

@@ -1,13 +1,14 @@
 package org.brac.microfinance.events;
 
+
 import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 import java.util.UUID;
 import org.brac.commons.primatives.Event;
+import org.springframework.data.relational.core.mapping.Table;
 
 @Entity
 @Table(name = "loan_accepted_events")
-public class LoanAcceptedEvent extends Event  {
+public class LoanAcceptedEvent extends Event {
   private UUID loanId;
   private UUID voucherId;
   private UUID disbursementId;

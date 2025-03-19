@@ -2,7 +2,8 @@ package org.brac.microfinance.repositories.event;
 
 import java.util.UUID;
 import org.brac.microfinance.events.LoanDisbursementRequestedEvent;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 
-public interface LoanDisbursementRequestedEventRepository extends CrudRepository<LoanDisbursementRequestedEvent, UUID> {
+public interface LoanDisbursementRequestedEventRepository extends
+    ReactiveCrudRepository<LoanDisbursementRequestedEvent, UUID> {
 }

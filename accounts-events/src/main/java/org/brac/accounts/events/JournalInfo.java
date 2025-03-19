@@ -1,21 +1,21 @@
 package org.brac.accounts.events;
 
 import jakarta.persistence.MappedSuperclass;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 import org.brac.commons.primatives.Entity;
 
 @MappedSuperclass
 public class JournalInfo extends Entity {
-  private Date date;
+  private OffsetDateTime date;
   private double debit;
   private double credit;
   private UUID head;
-  public Date getDate() {
+  public OffsetDateTime getDate() {
     return date;
   }
 
-  public void setDate(Date date) {
+  public void setDate(OffsetDateTime date) {
     this.date = date;
   }
   public double getDebit() {

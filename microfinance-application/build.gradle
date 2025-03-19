@@ -20,11 +20,10 @@ repositories {
 dependencies {
 
     implementation project(':commons')
-
     implementation project(':microfinance-events')
     implementation project(':microfinance-commands')
 
-    implementation 'org.postgresql:postgresql'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-pulsar'
+    runtimeOnly 'org.postgresql:r2dbc-postgresql'
+    implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+    implementation 'org.springframework.boot:spring-boot-starter-pulsar-reactive'
 }

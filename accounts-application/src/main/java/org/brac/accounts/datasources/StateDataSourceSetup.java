@@ -2,6 +2,7 @@ package org.brac.accounts.datasources;
 
 
 import io.r2dbc.spi.ConnectionFactory;
+import org.brac.accounts.repositories.state.JournalEntityRepository;
 import org.brac.accounts.repositories.state.VoucherAggregateRootRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.r2dbc.ConnectionFactoryBuilder;
@@ -17,7 +18,7 @@ import org.springframework.r2dbc.core.DatabaseClient;
 
 @Configuration()
 @EnableR2dbcRepositories(entityOperationsRef = "stateEntityTemplate", basePackageClasses = {
-    VoucherAggregateRootRepository.class})
+    JournalEntityRepository.class, VoucherAggregateRootRepository.class})
 public class StateDataSourceSetup {
 
   @Primary

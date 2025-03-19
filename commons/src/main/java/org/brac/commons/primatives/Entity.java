@@ -1,20 +1,22 @@
 package org.brac.commons.primatives;
 
 
-import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Version;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.UUID;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
 
 @MappedSuperclass
-public abstract class Entity {
+public abstract class Entity implements Persistable<UUID> {
   @Id
   private UUID id;
   private UUID createdBy;
-  private Date createdDate;
+  private OffsetDateTime createdDate;
   private String language;
-  private Date lastUpdatedDate;
+  private OffsetDateTime lastUpdatedDate;
   private UUID lastUpdatedBy;
   private UUID tenantId;
   private UUID verticalId;
@@ -40,11 +42,11 @@ public abstract class Entity {
     this.createdBy = createdBy;
   }
 
-  public Date getCreatedDate() {
+  public OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(Date createdDate) {
+  public void setCreatedDate(OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
@@ -56,11 +58,11 @@ public abstract class Entity {
     this.language = language;
   }
 
-  public Date getLastUpdatedDate() {
+  public OffsetDateTime getLastUpdatedDate() {
     return lastUpdatedDate;
   }
 
-  public void setLastUpdatedDate(Date lastUpdatedDate) {
+  public void setLastUpdatedDate(OffsetDateTime lastUpdatedDate) {
     this.lastUpdatedDate = lastUpdatedDate;
   }
 
@@ -114,7 +116,7 @@ public abstract class Entity {
 
   public void assignEntityDefaults(UUID userId, UUID tenantId, UUID verticalId) {
 
-    Date currentTime = new Date();
+    OffsetDateTime currentTime = OffsetDateTime.now();
 
 
     this.createdDate = currentTime;
@@ -125,6 +127,17 @@ public abstract class Entity {
     this.verticalId = verticalId;
     this.lastUpdatedDate = currentTime;
     this.lastUpdatedBy = userId;
+  }
+
+  @Transient
+  private  boolean isModified;
+
+  public void setModified() {
+    this.isModified = true;
+  }
+
+  public boolean isNew() {
+    return !this.isModified;
   }
 }
 

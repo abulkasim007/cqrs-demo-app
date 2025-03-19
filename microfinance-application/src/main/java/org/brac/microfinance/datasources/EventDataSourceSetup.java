@@ -1,52 +1,46 @@
 package org.brac.microfinance.datasources;
 
 
-import jakarta.persistence.EntityManagerFactory;
+import io.r2dbc.spi.ConnectionFactory;
 
-import javax.sql.DataSource;
-
+import org.brac.microfinance.repositories.event.DisbursementEventRepository;
+import org.brac.microfinance.repositories.event.LoanAcceptedEventRepository;
+import org.brac.microfinance.repositories.event.LoanDisbursementRequestedEventRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.jdbc.DataSourceBuilder;
-import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
+import org.springframework.boot.r2dbc.ConnectionFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.data.r2dbc.core.DefaultReactiveDataAccessStrategy;
+import org.springframework.data.r2dbc.core.R2dbcEntityOperations;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.r2dbc.dialect.PostgresDialect;
+import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
+import org.springframework.r2dbc.core.DatabaseClient;
 
 @Configuration
-@EnableTransactionManagement
-@EnableJpaRepositories(
-    entityManagerFactoryRef = "eventEntityManagerFactory",
-    transactionManagerRef = "eventTransactionManager",
-    basePackages = {"org.brac.microfinance.repositories.event"})
-@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
+@EnableR2dbcRepositories(entityOperationsRef = "eventEntityTemplate",
+    basePackageClasses = {LoanAcceptedEventRepository.class, LoanDisbursementRequestedEventRepository.class, DisbursementEventRepository.class})
 public class EventDataSourceSetup {
 
-  @Bean(name = "eventDataSource")
-  @ConfigurationProperties(prefix = "spring.event.datasource")
-  public DataSource eventDataSource() {
-    return DataSourceBuilder.create().build();
-  }
-
-  @Bean(name = "eventEntityManagerFactory")
-  public LocalContainerEntityManagerFactoryBean eventEntityManagerFactory(
-      EntityManagerFactoryBuilder entityManagerFactoryBuilder, @Qualifier("eventDataSource") DataSource dataSource) {
-
-    return entityManagerFactoryBuilder.dataSource(dataSource)
-        .packages("org.brac.microfinance.events")
-        .persistenceUnit("State")
+  @Bean
+  @Qualifier(value = "eventConnectionFactory")
+  public ConnectionFactory eventConnectionFactory() {
+    return ConnectionFactoryBuilder.withUrl("r2dbc:postgresql://localhost/microfinance_event_database")
+        .username("postgres")
+        .password("12345")
         .build();
   }
 
-  @Bean(name = "eventTransactionManager")
-  public PlatformTransactionManager eventTransactionManager(@Qualifier("eventEntityManagerFactory")
-                                                            EntityManagerFactory entityManagerFactory) {
-    return new JpaTransactionManager(entityManagerFactory);
+  @Bean
+  public R2dbcEntityOperations eventEntityTemplate(
+      @Qualifier("eventConnectionFactory") ConnectionFactory connectionFactory) {
+
+    DefaultReactiveDataAccessStrategy strategy = new DefaultReactiveDataAccessStrategy(PostgresDialect.INSTANCE);
+    DatabaseClient databaseClient = DatabaseClient.builder()
+        .connectionFactory(connectionFactory)
+        .bindMarkers(PostgresDialect.INSTANCE.getBindMarkersFactory())
+        .build();
+
+    return new R2dbcEntityTemplate(databaseClient, strategy);
   }
 }

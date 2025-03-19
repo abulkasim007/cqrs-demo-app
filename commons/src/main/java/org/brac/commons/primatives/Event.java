@@ -1,18 +1,19 @@
 package org.brac.commons.primatives;
 
 
-import jakarta.persistence.Id;
+import org.springframework.data.annotation.Id;
 import jakarta.persistence.MappedSuperclass;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.UUID;
+import org.springframework.data.domain.Persistable;
 
 @MappedSuperclass
-public abstract class Event {
+public abstract class Event implements Persistable<UUID> {
   @Id
   private UUID id;
   private UUID aggregateRootId;
   private int aggregateRootVersion;
-  private Date timeStamp;
+  private OffsetDateTime timeStamp;
   private String source;
 
   private UUID correlationId;
@@ -33,11 +34,11 @@ public abstract class Event {
     this.aggregateRootVersion = aggregateRootVersion;
   }
 
-  public Date getTimeStamp() {
+  public OffsetDateTime getTimeStamp() {
     return timeStamp;
   }
 
-  public void setTimeStamp(Date timeStamp) {
+  public void setTimeStamp(OffsetDateTime timeStamp) {
     this.timeStamp = timeStamp;
   }
 
@@ -48,7 +49,6 @@ public abstract class Event {
   public void setSource(String source) {
     this.source = source;
   }
-
 
 
   public UUID getId() {
@@ -65,5 +65,9 @@ public abstract class Event {
 
   public void setCorrelationId(UUID correlationId) {
     this.correlationId = correlationId;
+  }
+
+  public boolean isNew() {
+    return true;
   }
 }

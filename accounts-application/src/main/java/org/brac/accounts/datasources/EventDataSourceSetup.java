@@ -1,8 +1,9 @@
 package org.brac.accounts.datasources;
 
 
-
 import io.r2dbc.spi.ConnectionFactory;
+import org.brac.accounts.repositories.event.JournalEventRepository;
+import org.brac.accounts.repositories.event.VoucherCreatedEventRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.r2dbc.ConnectionFactoryBuilder;
 import org.springframework.context.annotation.Bean;
@@ -15,8 +16,8 @@ import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 import org.springframework.r2dbc.core.DatabaseClient;
 
 @Configuration
-@EnableR2dbcRepositories(entityOperationsRef = "eventEntityTemplate", basePackages = {
-    "org.brac.accounts.repositories.event"})
+@EnableR2dbcRepositories(entityOperationsRef = "eventEntityTemplate", basePackageClasses = {
+    JournalEventRepository.class, VoucherCreatedEventRepository.class})
 public class EventDataSourceSetup {
 
   @Bean

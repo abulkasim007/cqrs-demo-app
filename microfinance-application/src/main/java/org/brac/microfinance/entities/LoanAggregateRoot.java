@@ -1,19 +1,13 @@
 package org.brac.microfinance.entities;
 
-
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 import org.brac.commons.primatives.AggregateRoot;
 import org.brac.microfinance.events.DisbursementEvent;
-import org.brac.microfinance.events.DisbursementStatus;
-import org.brac.microfinance.events.LoanAcceptedEvent;
 import org.brac.microfinance.events.LoanDisbursementRequestedEvent;
+import org.springframework.data.relational.core.mapping.Table;
 
 @Entity
 @Table(name = "loan_aggregate_roots")
@@ -24,23 +18,9 @@ public class LoanAggregateRoot extends AggregateRoot {
   private UUID memberId;
   private double amount;
 
-  public Set<DisbursementEntity> getDisbursementEntities() {
-    return disbursementEntities;
-  }
-
-  public void setDisbursementEntities(
-      Set<DisbursementEntity> disbursementEntities) {
-    this.disbursementEntities = disbursementEntities;
-  }
-
-  @OneToMany(
-      mappedBy = "loanAggregateRoot",
-      cascade = CascadeType.ALL,
-      orphanRemoval = true
-  )
-  private Set<DisbursementEntity> disbursementEntities;
-
-  public LoanDisbursementRequestedEvent disburse(UUID loanId, double amount, UUID memberId, UUID tenantId, UUID verticalId) {
+  public LoanDisbursementRequestedEvent disburse(UUID loanId, double amount, UUID memberId, UUID tenantId,
+                                                 UUID verticalId, List<DisbursementEntity> disbursementEntities,
+                                                 List<DisbursementEvent> disbursementEvents) {
 
     this.setId(loanId);
     this.setAmount(amount);
@@ -48,7 +28,6 @@ public class LoanAggregateRoot extends AggregateRoot {
 
     this.assignEntityDefaults(memberId, tenantId, verticalId);
 
-    this.disbursementEntities = new HashSet<>();
 
     for (int i = 0; i < 5; i++) {
       DisbursementEntity disbursementEntity = new DisbursementEntity();
@@ -56,14 +35,13 @@ public class LoanAggregateRoot extends AggregateRoot {
       UUID disbursementId = UUID.randomUUID();
 
       disbursementEntity.setId(disbursementId);
-      disbursementEntity.setDate(new Date());
+      disbursementEntity.setDate(OffsetDateTime.now());
       disbursementEntity.setAmount(amount);
       disbursementEntity.setVoucherId(UUID.randomUUID());
       disbursementEntity.assignEntityDefaults(memberId, tenantId, verticalId);
-      disbursementEntity.setLoanAggregateRoot(this);
+
       disbursementEntity.setVoucherId(EMPTY_VOUCHER_ID);
-      disbursementEntity.setDisbursementStatus(DisbursementStatus.PENDING);
-      this.disbursementEntities.add(disbursementEntity);
+      disbursementEntities.add(disbursementEntity);
     }
 
 
@@ -73,65 +51,33 @@ public class LoanAggregateRoot extends AggregateRoot {
     loanDisbursementRequestedEvent.setAmount(amount);
     loanDisbursementRequestedEvent.setMemberId(memberId);
     loanDisbursementRequestedEvent.setDisbursementId(
-        this.disbursementEntities.stream().findAny().orElseThrow().getId());
-    loanDisbursementRequestedEvent.disbursementEvents =
-        from(this.disbursementEntities, loanDisbursementRequestedEvent, memberId, tenantId, verticalId);
+        disbursementEntities.stream().findAny().orElseThrow().getId());
+
+    from(disbursementEntities, disbursementEvents, memberId, tenantId, verticalId);
 
     loanDisbursementRequestedEvent.setId(UUID.randomUUID());
     loanDisbursementRequestedEvent.setAggregateRootId(this.getId());
     loanDisbursementRequestedEvent.setAggregateRootVersion(this.getVersion());
-    loanDisbursementRequestedEvent.setTimeStamp(new Date());
+    loanDisbursementRequestedEvent.setTimeStamp(OffsetDateTime.now());
     loanDisbursementRequestedEvent.setSource(LoanAggregateRoot.class.getName());
     loanDisbursementRequestedEvent.setCorrelationId(UUID.randomUUID());
 
     return loanDisbursementRequestedEvent;
   }
 
-  private static Set<DisbursementEvent> from(Set<DisbursementEntity> disbursements,
-                                             LoanDisbursementRequestedEvent loanDisbursementRequestedEvent,
-                                             UUID memberId, UUID tenantId, UUID verticalId) {
-
-    Set<DisbursementEvent> disbursementEvents = new HashSet<>();
+  private static void from(List<DisbursementEntity> disbursements,
+                           List<DisbursementEvent> disbursementEvents,
+                           UUID memberId, UUID tenantId, UUID verticalId) {
 
     for (DisbursementEntity disbursementEntity : disbursements) {
       DisbursementEvent disbursementEvent = new DisbursementEvent();
-
       disbursementEvent.setId(disbursementEntity.getId());
       disbursementEvent.setDate(disbursementEntity.getDate());
       disbursementEvent.setAmount(disbursementEntity.getAmount());
       disbursementEvent.assignEntityDefaults(memberId, tenantId, verticalId);
-      disbursementEvent.setLoanDisbursementRequestedEvent(loanDisbursementRequestedEvent);
-      disbursementEvent.setDisbursementStatus(disbursementEntity.getDisbursementStatus());
       disbursementEvent.setVoucherId(EMPTY_VOUCHER_ID);
-
       disbursementEvents.add(disbursementEvent);
     }
-    return disbursementEvents;
-  }
-
-
-  public LoanAcceptedEvent updateDisbursement(UUID disbursementId, UUID voucherId, DisbursementStatus disbursementStatus) {
-
-    DisbursementEntity disbursementEntity =
-        this.getDisbursementEntities().stream().filter(d -> d.getId().equals(disbursementId)).findFirst().orElseThrow();
-
-    disbursementEntity.updateDisbursementStatus(voucherId, disbursementStatus);
-
-
-      LoanAcceptedEvent loanAcceptedEvent = new LoanAcceptedEvent();
-      loanAcceptedEvent.setLoanId(this.getId());
-      loanAcceptedEvent.setDisbursementId(disbursementEntity.getId());
-      loanAcceptedEvent.setVoucherId(disbursementEntity.getVoucherId());
-
-      loanAcceptedEvent.setId(UUID.randomUUID());
-      loanAcceptedEvent.setAggregateRootId(this.getId());
-      loanAcceptedEvent.setAggregateRootVersion(this.getVersion());
-      loanAcceptedEvent.setTimeStamp(new Date());
-      loanAcceptedEvent.setSource(LoanAcceptedEvent.class.getName());
-      loanAcceptedEvent.setCorrelationId(UUID.randomUUID());
-
-
-     return loanAcceptedEvent;
   }
 
   public UUID getMemberId() {

@@ -1,54 +1,46 @@
 package org.brac.microfinance.datasources;
 
 
-import jakarta.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
+import io.r2dbc.spi.ConnectionFactory;
+import org.brac.microfinance.repositories.state.DisbursementEntityRepository;
+import org.brac.microfinance.repositories.state.LoanAggregateRootRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.boot.r2dbc.ConnectionFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.data.r2dbc.core.DefaultReactiveDataAccessStrategy;
+import org.springframework.data.r2dbc.core.R2dbcEntityOperations;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.r2dbc.dialect.PostgresDialect;
+import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
+import org.springframework.r2dbc.core.DatabaseClient;
 
 @Configuration
-@EnableTransactionManagement
-@EnableJpaRepositories(
-    entityManagerFactoryRef = "stateEntityManagerFactory",
-    transactionManagerRef = "stateTransactionManager",
-    basePackages = {"org.brac.microfinance.repositories.state"})
-@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
+@EnableR2dbcRepositories(entityOperationsRef = "stateEntityTemplate", basePackageClasses = {
+    LoanAggregateRootRepository.class, DisbursementEntityRepository.class})
 public class StateDataSourceSetup {
 
   @Primary
-  @Bean(name = "stateDataSource")
-  @ConfigurationProperties(prefix = "spring.state.datasource")
-  public DataSource stateDataSource() {
-    return DataSourceBuilder.create().build();
-  }
-
-  @Primary
-  @Bean(name = "stateEntityManagerFactory")
-  public LocalContainerEntityManagerFactoryBean stateEntityManagerFactory(
-      EntityManagerFactoryBuilder entityManagerFactoryBuilder, @Qualifier("stateDataSource") DataSource dataSource) {
-
-    return entityManagerFactoryBuilder.dataSource(dataSource)
-        .packages("org.brac.microfinance.entities")
-        .persistenceUnit("State")
+  @Bean
+  @Qualifier(value = "stateConnectionFactory")
+  public ConnectionFactory stateConnectionFactory() {
+    return ConnectionFactoryBuilder.withUrl("r2dbc:postgresql://localhost/microfinance_state_database")
+        .username("postgres")
+        .password("12345")
         .build();
   }
 
-  @Primary
-  @Bean(name = "stateTransactionManager")
-  public PlatformTransactionManager transactionManager(@Qualifier("stateEntityManagerFactory")
-                                                       EntityManagerFactory entityManagerFactory) {
-    return new JpaTransactionManager(entityManagerFactory);
+  @Bean
+  public R2dbcEntityOperations stateEntityTemplate(
+      @Qualifier("stateConnectionFactory") ConnectionFactory connectionFactory) {
+
+    DefaultReactiveDataAccessStrategy strategy = new DefaultReactiveDataAccessStrategy(PostgresDialect.INSTANCE);
+    DatabaseClient databaseClient = DatabaseClient.builder()
+        .connectionFactory(connectionFactory)
+        .bindMarkers(PostgresDialect.INSTANCE.getBindMarkersFactory())
+        .build();
+
+    return new R2dbcEntityTemplate(databaseClient, strategy);
   }
 }

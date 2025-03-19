@@ -6,9 +6,9 @@ import org.apache.pulsar.common.schema.SchemaType;
 import org.brac.commons.utils.JsonHelpers;
 import org.brac.microfinance.commands.UpdateDisbursementCommand;
 import org.brac.microfinance.services.LoanService;
-import org.springframework.pulsar.annotation.PulsarListener;
-import org.springframework.pulsar.listener.AckMode;
+import org.springframework.pulsar.reactive.config.annotation.ReactivePulsarListener;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 @Service
 public class UpdateDisbursementCommandListener {
@@ -20,10 +20,10 @@ public class UpdateDisbursementCommandListener {
   }
 
 
-  @PulsarListener(subscriptionName = "Microfinance.Write", topics = "Microfinance.Commands.UpdateDisbursementCommand",
-      schemaType = SchemaType.BYTES, autoStartup = "true", ackMode = AckMode.RECORD, subscriptionType = SubscriptionType.Shared)
-  public void listen(byte[] message) throws IOException {
+  @ReactivePulsarListener(subscriptionName = "Microfinance.Write", topics = "Microfinance.Commands.UpdateDisbursementCommand",
+      schemaType = SchemaType.BYTES, autoStartup = "true", subscriptionType = SubscriptionType.Shared)
+  public Mono<Void> listen(byte[] message) throws IOException {
     UpdateDisbursementCommand command = JsonHelpers.getMessage(message, UpdateDisbursementCommand.class);
-    loanService.updateDisbursement(command);
+    return loanService.updateDisbursement(command);
   }
 }

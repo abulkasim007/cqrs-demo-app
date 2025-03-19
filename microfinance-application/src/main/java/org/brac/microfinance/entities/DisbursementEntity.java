@@ -1,31 +1,35 @@
 package org.brac.microfinance.entities;
 
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+
+import jakarta.persistence.Entity;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 import org.brac.microfinance.events.DisbursementInfo;
-import org.brac.microfinance.events.DisbursementStatus;
+import org.brac.microfinance.events.LoanAcceptedEvent;
+import org.springframework.data.relational.core.mapping.Table;
 
-@jakarta.persistence.Entity
+@Entity
 @Table(name = "disbursement_entities")
 public class DisbursementEntity extends DisbursementInfo {
 
-  @ManyToOne(fetch = FetchType.EAGER)
-  private LoanAggregateRoot loanAggregateRoot;
+  public LoanAcceptedEvent updateDisbursement(UUID voucherId) {
 
-  public LoanAggregateRoot getLoanAggregateRoot() {
-    return loanAggregateRoot;
+    this.setModified();
+    this.setVoucherId(voucherId);
+
+    LoanAcceptedEvent loanAcceptedEvent = new LoanAcceptedEvent();
+    loanAcceptedEvent.setLoanId(this.getId());
+    loanAcceptedEvent.setDisbursementId(this.getId());
+    loanAcceptedEvent.setVoucherId(this.getVoucherId());
+
+    loanAcceptedEvent.setId(UUID.randomUUID());
+    loanAcceptedEvent.setAggregateRootId(this.getId());
+    loanAcceptedEvent.setAggregateRootVersion(this.getVersion());
+    loanAcceptedEvent.setTimeStamp(OffsetDateTime.now());
+    loanAcceptedEvent.setSource(LoanAcceptedEvent.class.getName());
+    loanAcceptedEvent.setCorrelationId(UUID.randomUUID());
+
+    return loanAcceptedEvent;
   }
 
-  public void setLoanAggregateRoot(LoanAggregateRoot loanAggregateRoot) {
-    this.loanAggregateRoot = loanAggregateRoot;
-  }
-
-  public void updateDisbursementStatus(UUID voucherId, DisbursementStatus disbursementStatus) {
-    if (disbursementStatus == DisbursementStatus.ACCEPTED) {
-      this.setVoucherId(voucherId);
-    }
-    this.setDisbursementStatus(disbursementStatus);
-  }
 }

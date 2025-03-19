@@ -1,16 +1,16 @@
 package org.brac.microfinance.events;
 
 import jakarta.persistence.MappedSuperclass;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 import org.brac.commons.primatives.Entity;
 
 @MappedSuperclass
 public class DisbursementInfo extends Entity {
-  private Date date;
+  private OffsetDateTime date;
   private double amount;
   private UUID voucherId;
-  private DisbursementStatus disbursementStatus;
+
 
   public double getAmount() {
     return amount;
@@ -20,13 +20,17 @@ public class DisbursementInfo extends Entity {
     this.amount = amount;
   }
 
-  public Date getDate() {
+  public OffsetDateTime getDate() {
     return date;
   }
 
-  public void setDate(Date date) {
+  public void setDate(OffsetDateTime date) {
     this.date = date;
   }
+
+  private int disbursementStatus = 0;
+
+/*  private DisbursementStatus disbursementStatus;
 
   public DisbursementStatus getDisbursementStatus() {
     return disbursementStatus;
@@ -35,7 +39,7 @@ public class DisbursementInfo extends Entity {
   public void setDisbursementStatus(
       DisbursementStatus disbursementStatus) {
     this.disbursementStatus = disbursementStatus;
-  }
+  }*/
 
   public UUID getVoucherId() {
     return voucherId;
@@ -43,5 +47,13 @@ public class DisbursementInfo extends Entity {
 
   public void setVoucherId(UUID voucherId) {
     this.voucherId = voucherId;
+  }
+
+  public int getDisbursementStatus() {
+    return disbursementStatus;
+  }
+
+  public void setDisbursementStatus(int disbursementStatus) {
+    this.disbursementStatus = disbursementStatus;
   }
 }

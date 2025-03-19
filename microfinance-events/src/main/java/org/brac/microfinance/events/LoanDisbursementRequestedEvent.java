@@ -1,26 +1,19 @@
 package org.brac.microfinance.events;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import java.util.Set;
+
+
+import jakarta.persistence.Entity;
 import java.util.UUID;
 import org.brac.commons.primatives.Event;
+import org.springframework.data.relational.core.mapping.Table;
 
-@jakarta.persistence.Entity
+@Entity
 @Table(name = "loan_disbursement_requested_events")
 public class LoanDisbursementRequestedEvent extends Event {
   private UUID loanId;
   private UUID memberId;
   private double amount;
   private UUID disbursementId;
-
-  @OneToMany(
-      mappedBy = "loanDisbursementRequestedEvent",
-      cascade = CascadeType.ALL,
-      orphanRemoval = true
-  )
-  public Set<DisbursementEvent> disbursementEvents;
 
   public UUID getLoanId() {
     return loanId;
