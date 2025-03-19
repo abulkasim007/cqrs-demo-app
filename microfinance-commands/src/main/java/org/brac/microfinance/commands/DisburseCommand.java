@@ -9,11 +9,9 @@ public class DisburseCommand {
   private final UUID memberId = UUID.randomUUID();
   private final UUID tenantId = UUID.randomUUID();
   private final UUID verticalId = UUID.randomUUID();
-
   public double getAmount() {
     return amount;
   }
-
   public UUID getLoanId() {
     return loanId;
   }

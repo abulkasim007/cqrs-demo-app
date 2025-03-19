@@ -20,7 +20,6 @@ public class VoucherAggregateRoot extends AggregateRoot {
   private double amount;
   private UUID loanId;
 
-
   public VoucherCreatedEvent create(UUID loanId, double amount, UUID memberId, UUID disbursementId, UUID tenantId,
                                     UUID verticalId,
                                     List<JournalEntity> journalEntities, List<JournalEvent> journalEvents) {
@@ -97,29 +96,14 @@ public class VoucherAggregateRoot extends AggregateRoot {
       journalEvent.assignEntityDefaults(memberId, tenantId, verticalId);
       journalEvents.add(journalEvent);
     }
-
-  }
-
-
-  public UUID getMemberId() {
-    return memberId;
   }
 
   public void setMemberId(UUID memberId) {
     this.memberId = memberId;
   }
 
-  public double getAmount() {
-    return amount;
-  }
-
   public void setAmount(double amount) {
     this.amount = amount;
-  }
-
-
-  public UUID getLoanId() {
-    return loanId;
   }
 
   public void setLoanId(UUID loanId) {

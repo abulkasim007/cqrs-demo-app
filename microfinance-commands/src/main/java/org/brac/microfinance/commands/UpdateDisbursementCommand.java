@@ -8,9 +8,6 @@ public class UpdateDisbursementCommand {
   private UUID disbursementId;
   private final UUID tenantId= UUID.randomUUID();
   private final UUID verticalId= UUID.randomUUID();
-  public UUID getLoanId() {
-    return loanId;
-  }
 
   public void setLoanId(UUID loanId) {
     this.loanId = loanId;
@@ -30,14 +27,6 @@ public class UpdateDisbursementCommand {
 
   public void setDisbursementId(UUID disbursementId) {
     this.disbursementId = disbursementId;
-  }
-
-  public UUID getTenantId() {
-    return tenantId;
-  }
-
-  public UUID getVerticalId() {
-    return verticalId;
   }
 }
 

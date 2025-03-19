@@ -13,13 +13,11 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class LoanDisbursementRequestedEventListener {
-
   private final ErpOrchestrator erpOrchestrator;
 
   public LoanDisbursementRequestedEventListener(ErpOrchestrator erpOrchestrator) {
     this.erpOrchestrator = erpOrchestrator;
   }
-
 
   @ReactivePulsarListener(subscriptionName = "Erp.Orchestrator", topics = "Microfinance.Events.LoanDisbursementRequestedEvent",
       schemaType = SchemaType.BYTES, autoStartup = "true", subscriptionType = SubscriptionType.Shared)

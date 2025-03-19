@@ -21,16 +21,8 @@ public class LoanAcceptedEvent extends Event {
     this.loanId = loanId;
   }
 
-  public UUID getVoucherId() {
-    return voucherId;
-  }
-
   public void setVoucherId(UUID voucherId) {
     this.voucherId = voucherId;
-  }
-
-  public UUID getDisbursementId() {
-    return disbursementId;
   }
 
   public void setDisbursementId(UUID disbursementId) {

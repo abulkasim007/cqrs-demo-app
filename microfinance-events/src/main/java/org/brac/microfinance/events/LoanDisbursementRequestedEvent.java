@@ -1,7 +1,5 @@
 package org.brac.microfinance.events;
 
-
-
 import jakarta.persistence.Entity;
 import java.util.UUID;
 import org.brac.commons.primatives.Event;

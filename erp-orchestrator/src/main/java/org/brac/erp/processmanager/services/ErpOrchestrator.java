@@ -16,7 +16,6 @@ public class ErpOrchestrator {
   private final ReactivePulsarTemplate<CreateVoucherCommand> createVoucherCommandPulsarTemplate;
   private final ReactivePulsarTemplate<UpdateDisbursementCommand> updateDisbursementCommandPulsarTemplate;
 
-
   public ErpOrchestrator(ReactivePulsarTemplate<CreateVoucherCommand> createVoucherCommandPulsarTemplate,
                          ReactivePulsarTemplate<UpdateDisbursementCommand> updateDisbursementCommandPulsarTemplate) {
 

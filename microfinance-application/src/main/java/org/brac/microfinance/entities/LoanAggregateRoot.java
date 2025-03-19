@@ -28,7 +28,6 @@ public class LoanAggregateRoot extends AggregateRoot {
 
     this.assignEntityDefaults(memberId, tenantId, verticalId);
 
-
     for (int i = 0; i < 5; i++) {
       DisbursementEntity disbursementEntity = new DisbursementEntity();
 
@@ -80,20 +79,11 @@ public class LoanAggregateRoot extends AggregateRoot {
     }
   }
 
-  public UUID getMemberId() {
-    return memberId;
-  }
-
   public void setMemberId(UUID memberId) {
     this.memberId = memberId;
-  }
-
-  public double getAmount() {
-    return amount;
   }
 
   public void setAmount(double amount) {
     this.amount = amount;
   }
-
 }

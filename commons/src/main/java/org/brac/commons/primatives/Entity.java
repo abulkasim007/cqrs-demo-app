@@ -34,90 +34,13 @@ public abstract class Entity implements Persistable<UUID> {
     this.id = id;
   }
 
-  public UUID getCreatedBy() {
-    return createdBy;
-  }
-
-  public void setCreatedBy(UUID createdBy) {
-    this.createdBy = createdBy;
-  }
-
-  public OffsetDateTime getCreatedDate() {
-    return createdDate;
-  }
-
-  public void setCreatedDate(OffsetDateTime createdDate) {
-    this.createdDate = createdDate;
-  }
-
-  public String getLanguage() {
-    return language;
-  }
-
-  public void setLanguage(String language) {
-    this.language = language;
-  }
-
-  public OffsetDateTime getLastUpdatedDate() {
-    return lastUpdatedDate;
-  }
-
-  public void setLastUpdatedDate(OffsetDateTime lastUpdatedDate) {
-    this.lastUpdatedDate = lastUpdatedDate;
-  }
-
-  public UUID getLastUpdatedBy() {
-    return lastUpdatedBy;
-  }
-
-  public void setLastUpdatedBy(UUID lastUpdatedBy) {
-    this.lastUpdatedBy = lastUpdatedBy;
-  }
-
-  public UUID getTenantId() {
-    return tenantId;
-  }
-
-  public void setTenantId(UUID tenantId) {
-    this.tenantId = tenantId;
-  }
-
-  public UUID getVerticalId() {
-    return verticalId;
-  }
-
-  public void setVerticalId(UUID verticalId) {
-    this.verticalId = verticalId;
-  }
-
-  public String getServiceId() {
-    return serviceId;
-  }
-
-  public void setServiceId(String serviceId) {
-    this.serviceId = serviceId;
-  }
-
-  public boolean isMarkedToDelete() {
-    return isMarkedToDelete;
-  }
-
-  public void setMarkedToDelete(boolean markedToDelete) {
-    isMarkedToDelete = markedToDelete;
-  }
-
   public int getVersion() {
     return version;
-  }
-
-  public void setVersion(int version) {
-    this.version = version;
   }
 
   public void assignEntityDefaults(UUID userId, UUID tenantId, UUID verticalId) {
 
     OffsetDateTime currentTime = OffsetDateTime.now();
-
 
     this.createdDate = currentTime;
     this.createdBy = userId;

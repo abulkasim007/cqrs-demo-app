@@ -8,7 +8,6 @@ import org.brac.microfinance.commands.UpdateDisbursementCommand;
 import org.brac.microfinance.entities.DisbursementEntity;
 import org.brac.microfinance.entities.LoanAggregateRoot;
 import org.brac.microfinance.events.DisbursementEvent;
-//import org.brac.microfinance.events.DisbursementStatus;
 import org.brac.microfinance.events.LoanAcceptedEvent;
 import org.brac.microfinance.events.LoanDisbursementRequestedEvent;
 import org.brac.microfinance.repositories.event.DisbursementEventRepository;
@@ -65,7 +64,6 @@ public class LoanService {
             .send("Microfinance.Events.LoanDisbursementRequestedEvent", loanDisbursementRequestedEvent)
         );
   }
-
 
   public Mono<Void> updateDisbursement(UpdateDisbursementCommand command) {
     return this.disbursementEntityRepository.findById(command.getDisbursementId())

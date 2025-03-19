@@ -1,6 +1,5 @@
 package org.brac.microfinance.events;
 
-
 import jakarta.persistence.Entity;
 import org.springframework.data.relational.core.mapping.Table;
 
